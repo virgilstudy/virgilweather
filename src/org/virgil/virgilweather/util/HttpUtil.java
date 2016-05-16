@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.util.Log;
+
 public class HttpUtil {
 	public static void sendHttpRequest(final String address, final HttpCallBackListenser listenser) {
 		new Thread(new Runnable() {
@@ -13,6 +15,7 @@ public class HttpUtil {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+				Log.d("virgil", "address:"+address);
 				HttpURLConnection connection = null;
 				try {
 					URL url = new URL(address);
@@ -40,6 +43,6 @@ public class HttpUtil {
 					}
 				}
 			}
-		});
+		}).start();
 	}
 }
