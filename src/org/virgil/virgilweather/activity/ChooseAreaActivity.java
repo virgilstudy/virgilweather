@@ -27,4 +27,5 @@ public class ChooseAreaActivity extends Activity {
 	private List<City> cityList;
 	private List<Country> countryList;
 
+
 }
