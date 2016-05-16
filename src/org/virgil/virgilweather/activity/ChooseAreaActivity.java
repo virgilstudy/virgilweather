@@ -1,6 +1,7 @@
 package org.virgil.virgilweather.activity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.virgil.virgilweather.R;
@@ -101,6 +102,7 @@ public class ChooseAreaActivity extends Activity {
 			dataList.clear();
 			for (City city : cityList) {
 				Log.d("virgil", "city:"+city.getCityName());
+				System.out.println(city.getCityName());
 				dataList.add(city.getCityName());
 			}
 			adapter.notifyDataSetChanged();
@@ -116,7 +118,9 @@ public class ChooseAreaActivity extends Activity {
 		countryList = coolWeatherDB.loadCountry(selectedCity.getId());
 		if (countryList.size() > 0) {
 			dataList.clear();
+			
 			for (Country c : countryList) {
+				Log.d("virgil","countryName:"+c.getCountryName());
 				dataList.add(c.getCountryName());
 			}
 			adapter.notifyDataSetChanged();

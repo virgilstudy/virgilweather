@@ -21,7 +21,7 @@ public class Utility {
 			if (allProvinces != null && allProvinces.length > 0) {
 				for (String p : allProvinces) {
 					String[] array = p.split("\\|");
-					Log.d("virgil", "city:" + Arrays.toString(array));
+					
 					Province province = new Province();
 					province.setProvinceCode(array[0]);
 					province.setProvinceName(array[1]);
@@ -40,7 +40,8 @@ public class Utility {
 			String[] allcity = response.split(",");
 			if (allcity != null && allcity.length > 0) {
 				for (String c : allcity) {
-					String[] array = c.split("//|");
+					String[] array = c.split("\\|");
+					Log.d("virgil", "city:" + Arrays.toString(array));
 					City city = new City();
 					city.setCityCode(array[0]);
 					city.setCityName(array[1]);
