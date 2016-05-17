@@ -17,7 +17,10 @@ import org.virgil.virgilweather.util.Utility;
 import android.app.Activity;
 import android.app.DownloadManager.Query;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -36,7 +39,7 @@ public class ChooseAreaActivity extends Activity {
 	private TextView titleView;
 	private ListView listView;
 	private ArrayAdapter<String> adapter;
-	private List<String> dataList=new ArrayList<>();
+	private List<String> dataList = new ArrayList<>();
 	private CoolWeatherDB coolWeatherDB;
 	private List<Province> provinceList;
 	private List<City> cityList;
@@ -50,20 +53,31 @@ public class ChooseAreaActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO 自动生成的方法存根
 		super.onCreate(savedInstanceState);
-		isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+		isFromWeatherActivity = getIntent().getBooleanExtra(
+				"from_weather_activity", false);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+			Intent intent = new Intent(this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		coolWeatherDB = CoolWeatherDB.getInstance(this);
-		//queryprovince();
-		Log.d("virgil", ""+dataList.size());
+		// queryprovince();
+		Log.d("virgil", "" + dataList.size());
 		listView = (ListView) findViewById(R.id.list_view);
 		titleView = (TextView) findViewById(R.id.title_text);
-		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dataList);
+		adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, dataList);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+					long arg3) {
 				// TODO 自动生成的方法存根
 				if (currentLevel == LEVEL_PROVINCE) {
 					Log.d("virgil", "query_city");
@@ -73,6 +87,13 @@ public class ChooseAreaActivity extends Activity {
 					Log.d("virgil", "query_country");
 					selectedCity = cityList.get(index);
 					queryCountry();
+				} else if (currentLevel == LEVEL_COUNTRY) {
+					String countryCode = countryList.get(index).getCountrCode();
+					Intent intent = new Intent(ChooseAreaActivity.this,
+							WeatherActivity.class);
+					intent.putExtra("coutry_code", countryCode);
+					startActivity(intent);
+					finish();
 				}
 			}
 		});
@@ -101,7 +122,7 @@ public class ChooseAreaActivity extends Activity {
 		if (cityList.size() > 0) {
 			dataList.clear();
 			for (City city : cityList) {
-				Log.d("virgil", "city:"+city.getCityName());
+				Log.d("virgil", "city:" + city.getCityName());
 				System.out.println(city.getCityName());
 				dataList.add(city.getCityName());
 			}
@@ -118,9 +139,9 @@ public class ChooseAreaActivity extends Activity {
 		countryList = coolWeatherDB.loadCountry(selectedCity.getId());
 		if (countryList.size() > 0) {
 			dataList.clear();
-			
+
 			for (Country c : countryList) {
-				Log.d("virgil","countryName:"+c.getCountryName());
+				Log.d("virgil", "countryName:" + c.getCountryName());
 				dataList.add(c.getCountryName());
 			}
 			adapter.notifyDataSetChanged();
@@ -134,9 +155,10 @@ public class ChooseAreaActivity extends Activity {
 
 	private void queryFromServer(final String code, final String type) {
 		String address;
-		Log.d("virgil", ""+code);
+		Log.d("virgil", "" + code);
 		if (!TextUtils.isEmpty(code)) {
-			address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
+			address = "http://www.weather.com.cn/data/list3/city" + code
+					+ ".xml";
 		} else {
 			address = "http://www.weather.com.cn/data/list3/city.xml";
 		}
@@ -150,13 +172,16 @@ public class ChooseAreaActivity extends Activity {
 				Log.d("virgil", response);
 				boolean result = false;
 				if ("province".equals(type)) {
-					result = Utility.processProvinceSResponse(coolWeatherDB, response);
+					result = Utility.processProvinceSResponse(coolWeatherDB,
+							response);
 				} else if ("city".equals(type)) {
-					result = Utility.processCityResponse(coolWeatherDB, response, selectedProvince.getId());
+					result = Utility.processCityResponse(coolWeatherDB,
+							response, selectedProvince.getId());
 				} else if ("country".equals(type)) {
-					result = Utility.processCountryResponse(coolWeatherDB, response, selectedCity.getId());
+					result = Utility.processCountryResponse(coolWeatherDB,
+							response, selectedCity.getId());
 				}
-				Log.d("virgil", "request_result:"+result);
+				Log.d("virgil", "request_result:" + result);
 				if (result) {
 					runOnUiThread(new Runnable() {
 
@@ -185,7 +210,8 @@ public class ChooseAreaActivity extends Activity {
 					@Override
 					public void run() {
 						// TODO 自动生成的方法存根
-						Toast.makeText(ChooseAreaActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+						Toast.makeText(ChooseAreaActivity.this, "加载失败",
+								Toast.LENGTH_SHORT).show();
 					}
 				});
 			}
@@ -214,6 +240,10 @@ public class ChooseAreaActivity extends Activity {
 		} else if (currentLevel == this.LEVEL_CITY) {
 			queryprovince();
 		} else {
+			if(isFromWeatherActivity){
+				Intent intent=new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}

@@ -30,6 +30,7 @@ public class HttpUtil {
 					while ((line = reader.readLine()) != null) {
 						response.append(line);
 					}
+					Log.d("virgil","response:"+response.toString());
 					if (listenser != null) {
 						listenser.onFinish(response.toString());
 					}
